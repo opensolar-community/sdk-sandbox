@@ -1,0 +1,12 @@
+{
+    "[javascript][javascriptreact][typescript][typescriptreact][json][yaml][toml]": {
+      "editor.formatOnSave": true,
+      "editor.codeActionsOnSave": {
+        "source.fixAll": "always",
+        "source.organizeImports": "always"
+      },
+      "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "typescript.enablePromptUseWorkspaceTsdk": true
+  }
+  
