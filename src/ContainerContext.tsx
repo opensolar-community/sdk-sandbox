@@ -1,4 +1,4 @@
-import { useOsSdk } from 'ossdk-react'
+import { useOsSdk } from '@opensolar/ossdk-react'
 import { createContext, useEffect, useState } from 'react'
 import { clearLocalStorage, keysForLocalStorage, loadFromLocalStorage } from './localStorage'
 import { getSetting, setSetting } from './settings'

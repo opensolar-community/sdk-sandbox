@@ -1,6 +1,6 @@
 # sdk-sandbox
 
-This is a reference implementation for integrating with the [OpenSolar SDK](https://developers.opensolar.com/sdk/). This implementation relies on the [React library](https://www.npmjs.com/package/ossdk-react) for the OpenSolar SDK.
+This is a reference implementation for integrating with the [OpenSolar SDK](https://developers.opensolar.com/sdk/learn). This implementation relies on the [React library](https://www.npmjs.com/package/@opensolar/ossdk-react) for the OpenSolar SDK.
 
 
 # Introduction
@@ -30,9 +30,10 @@ For values of these environment variables and SDK [configuration](https://develo
 
 # References
 
-* [SDK documentation](https://developers.opensolar.com/sdk/) for guides to get started and detailed information about the SDK. 
-* [OpenSolar React library](https://www.npmjs.com/package/ossdk-react) for the SDK can be found on NPM.
-* See the demo live online (Coming soon)
+* [SDK documentation](https://developers.opensolar.com/sdk/learn) for guides to get started and detailed information about the SDK. 
+* [OpenSolar React library](https://www.npmjs.com/package/@opensolar/ossdk-react) for the SDK can be found on NPM.
+* See the [demo live](https://sandbox.opensolar.com/)
+* See the [sandbox code](https://github.com/opensolar-community/sdk-sandbox/)
 
 
 # License
