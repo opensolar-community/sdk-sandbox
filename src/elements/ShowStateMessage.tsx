@@ -11,11 +11,7 @@ const styles = {
   },
 }
 const ShowStateMessage = () => {
-  const {
-    loginMethod,
-    projectKey,
-    osOrgId,
-  } = useContext(ContainerContext)
+  const { loginMethod, projectKey, osOrgId } = useContext(ContainerContext)
 
   const alerts: any[] = []
 
@@ -24,7 +20,8 @@ const ShowStateMessage = () => {
   if (!osOrgId && !final) {
     alerts.push(
       <span>
-        osOrgId parameter is required and is based on the org_id for the target environment. e.g. &osOrgId=123
+        The "osOrgId" parameter is required for initialising SDK and should be based on the org_id of the provided JWT.
+        Please refer to the README for more information.
       </span>
     )
     final = true
@@ -40,12 +37,7 @@ const ShowStateMessage = () => {
   }
 
   if (!projectKey && !final) {
-    alerts.push(
-      <span>
-        projectKey not supplied. OsSdkView only shows after projectKey is set. Click{' '}
-        <span style={styles.code}> Basic &gt; Project 1</span>
-      </span>
-    )
+    alerts.push(<span>Please provide a client code in Settings &gt; Client code.</span>)
     final = true
   }
 

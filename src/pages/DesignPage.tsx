@@ -9,7 +9,6 @@ import { ContainerContext } from '../ContainerContext'
 import { InputButtonMenu, OutputButtonMenu } from '../elements/ButtonMenu'
 import FloatingToolbar from '../elements/FloatingToolbar'
 import ShowStateMessage from '../elements/ShowStateMessage'
-import SettingsDrawer from '../SettingsDrawer'
 
 enum ButtonTab {
   input = 0,
@@ -24,7 +23,6 @@ function a11yProps(id: ButtonTab) {
 }
 
 function DesignPage() {
-  const [showSettingsDrawer, setShowSettingsDrawer] = useState(false)
   const params = useParams()
 
   const {
@@ -47,7 +45,6 @@ function DesignPage() {
     extraScriptParams,
     setHasUnsavedChanges,
     setProjectDirtyFields,
-    componentMappingKey,
     setOrgId,
     setCurrentRole,
     setAvailableImagery,
@@ -254,7 +251,6 @@ function DesignPage() {
               />
             )}
           </div>
-          <SettingsDrawer showSettings={showSettingsDrawer} setShowSettings={setShowSettingsDrawer} />
         </Paper>
       )}
     </>

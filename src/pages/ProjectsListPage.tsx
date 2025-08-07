@@ -1,6 +1,8 @@
 import {
   Box,
   Button,
+  Card,
+  CardContent,
   Container,
   Dialog,
   DialogActions,
@@ -8,15 +10,16 @@ import {
   DialogTitle,
   Paper,
   TextField,
-  Typography,
-} from '@mui/material'
-import { DataGrid, GridColDef } from '@mui/x-data-grid'
+  Typography
+} from '@mui/material';
+import { DataGrid, GridColDef } from '@mui/x-data-grid';
 
-import AddIcon from '@mui/icons-material/Add'
-import EditIcon from '@mui/icons-material/Edit'
+import AddIcon from '@mui/icons-material/Add';
+import EditIcon from '@mui/icons-material/Edit';
+import WarningIcon from '@mui/icons-material/Warning';
 
-import React, { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router'
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router';
 
 const ProjectsList = () => {
   const _rows = [
@@ -134,6 +137,18 @@ const ProjectsList = () => {
       <Dialog open={open} onClose={handleClose}>
         <DialogTitle>Create New Project</DialogTitle>
         <DialogContent>
+          <Card sx={{ mb: 2, bgcolor: '#fff8e6' }}>
+            <CardContent>
+              <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                <WarningIcon color="warning" fontSize="large" />
+                <Typography variant="h6">
+                  WARNING
+                </Typography></Box>
+              <Typography variant="body2">
+                Projects created in this environment do not persist across sessions. However, they are added to your OpenSolar organization account and can be accessed in the Sandbox using their unique identifier.
+              </Typography>
+            </CardContent>
+          </Card>
           <TextField
             autoFocus
             margin="dense"

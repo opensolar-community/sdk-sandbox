@@ -7,14 +7,17 @@
     "@emotion/react": "^11.11.4",
     "@emotion/styled": "^11.11.5",
     "@fontsource/roboto": "^5.0.13",
+    "@microlink/react-json-view": "^1.26.2",
     "@mui/icons-material": "^5.15.20",
     "@mui/material": "^5.15.20",
     "@mui/x-data-grid": "^7.28.2",
+    "@opensolar/ossdk-react": "0.8.2",
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
-    "@opensolar/ossdk-react": "0.8.2",
-    "react-router": "^7.4.0",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1",
+    "react-router-dom": "^7.6.3",
     "react-scripts": "5.0.1",
     "web-vitals": "^2.1.4"
   },
@@ -43,8 +46,6 @@
     ]
   },
   "devDependencies": {
-    "react": "18.2.0",
-    "react-dom": "18.2.0",
     "typescript": "^5.4.5"
   }
 }

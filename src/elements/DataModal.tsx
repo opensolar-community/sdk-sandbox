@@ -1,4 +1,6 @@
-import { Box, Modal } from '@mui/material'
+import ReactJsonView from '@microlink/react-json-view'
+import { Box, Button, Modal } from '@mui/material'
+import { useMemo } from 'react'
 
 const style = {
   position: 'absolute',
@@ -12,12 +14,23 @@ const style = {
   p: 4,
 }
 
+const COLLAPSE_AT_DEPTH = 2
+
 const DataModal = ({ dataTitle, dataModalContent, setDataTitle, setDataModalContent, showDataModal, setShowDataModal }) => {
   const handleClose = () => {
     setShowDataModal(false)
     setDataTitle('')
     setDataModalContent('')
   }
+
+  const outputData = useMemo(() => {
+    try {
+      return dataModalContent ? JSON.parse(dataModalContent) : {};
+    } catch (error) {
+      console.error("Failed to parse JSON:", error);
+      return {};
+    }
+  }, [dataModalContent])
   return (
     <Modal
       open={showDataModal}
@@ -29,9 +42,14 @@ const DataModal = ({ dataTitle, dataModalContent, setDataTitle, setDataModalCont
         <div>
           <h1>{dataTitle}</h1>
           <Box sx={{ maxHeight: '80vh', overflowY: 'scroll' }}>
-            <pre>{dataModalContent}</pre>
+            <ReactJsonView
+              name={false}
+              src={outputData}
+              collapsed={COLLAPSE_AT_DEPTH} />
           </Box>
-          <button onClick={handleClose}>Close</button>
+          <Button sx={{ mt: 2 }} variant="contained" onClick={handleClose}>
+            Close
+          </Button>
         </div>
       </Box>
     </Modal>

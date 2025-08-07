@@ -11,10 +11,10 @@ interface Props {
 }
 
 const TabSettings = ({ selectedTab, tabIndex, setSelectedTab, tabPrefix }: Props) => {
-  const { osSdkKey, setOsSdkKey, osToken, setOsToken } = useContext(ContainerContext)
+  const { osSdkKey, setOsSdkKey, osToken, setOsToken, ossdk } = useContext(ContainerContext)
   const [sdkKeyValue, setSdkKeyValue] = useState(osSdkKey ?? '')
   const [osTokenValue, setOsTokenValue] = useState(osToken ?? '')
-  const [isSnackbarOpen, setIsSnackbarOpen] = useState(false)
+  const [snackbarMessage, setSnackbarMessage] = useState('')
 
   const handleSave = () => {
     if (sdkKeyValue !== osSdkKey) {
@@ -23,23 +23,30 @@ const TabSettings = ({ selectedTab, tabIndex, setSelectedTab, tabPrefix }: Props
     if (osTokenValue !== osToken) {
       setOsToken(osTokenValue)
     }
-    setIsSnackbarOpen(true)
+    setSnackbarMessage('Settings saved')
   }
 
   const handleCloseSnackbar = () => {
-    setIsSnackbarOpen(false)
+    setSnackbarMessage('')
+  }
+
+  const handleLogout = () => {
+    setOsTokenValue('')
+    setOsToken('')
+    ossdk?.auth?.logout()
+    setSnackbarMessage('Logged out')
   }
 
   return (
     <CustomTabPanel value={selectedTab} index={tabIndex} prefix={tabPrefix}>
       <Snackbar
         anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-        open={isSnackbarOpen}
+        open={snackbarMessage}
         onClose={handleCloseSnackbar}
-        message="Settings saved"
+        message={snackbarMessage}
         key="settings-snackbar"
       />
-      <Stack direction="column" spacing={1}>
+      <Stack direction="column" spacing={2}>
         <Typography variant="h6">Client Code</Typography>
         <Typography variant="body1">
           The Client Code is necessary for verifying the integration with the SDK. Request your Client Code from{' '}
@@ -48,7 +55,7 @@ const TabSettings = ({ selectedTab, tabIndex, setSelectedTab, tabPrefix }: Props
         <TextField
           required
           id="sdk_key"
-          label="SDK Key"
+          label="Client Code"
           variant="standard"
           value={sdkKeyValue}
           onChange={(event: React.ChangeEvent<HTMLInputElement>) => setSdkKeyValue(event.target.value)}
@@ -66,9 +73,13 @@ const TabSettings = ({ selectedTab, tabIndex, setSelectedTab, tabPrefix }: Props
           value={osTokenValue}
           onChange={(event: React.ChangeEvent<HTMLInputElement>) => setOsTokenValue(event.target.value)}
         />
+        <Button variant="outlined" onClick={handleLogout}>
+          Logout
+        </Button>
         <Typography variant="body1">
           Or request a new JWT from <a href="https://www.opensolar.com/partner-services/">partners services</a>.
         </Typography>
+
         <Box>
           <Box display={'flex'} justifyContent={'flex-end'}>
             <Button variant="contained" onClick={handleSave}>

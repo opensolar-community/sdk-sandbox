@@ -1,6 +1,7 @@
+import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField } from '@mui/material'
 import Button from '@mui/material/Button'
 import Stack from '@mui/material/Stack'
-import { useContext, useState } from 'react'
+import React, { useContext, useState } from 'react'
 import { doSave, setLonLat } from '../commands'
 import { ContainerContext } from '../ContainerContext'
 import { CustomTabPanel, Divider } from '../utils'
@@ -19,10 +20,69 @@ interface Props {
   tabPrefix: string
 }
 
+function SetbacksDialog({
+  open,
+  onClose,
+  setSetbackId,
+  setbackPrompt,
+  setbackId,
+  osApiRoot,
+  orgId,
+  ossdk,
+}: {
+  open: boolean
+  onClose: () => void
+  setSetbackId: (value: string) => void
+  setbackPrompt: string
+  setbackId: string
+  osApiRoot: string
+  orgId: string
+  ossdk: any
+}) {
+  return (
+    <Dialog open={open} onClose={onClose}>
+      <DialogTitle>Override Setbacks</DialogTitle>
+      <DialogContent>
+        <DialogContentText sx={{ whiteSpace: 'pre-line' }}>{setbackPrompt}</DialogContentText>
+        <TextField
+          type="number"
+          fullWidth
+          required
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+            const { value } = e.target
+            setSetbackId(value)
+          }}
+        />
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={onClose} variant="outlined" color="secondary">
+          Cancel
+        </Button>
+        <Button
+          onClick={async () => {
+            if (setbackId) {
+              const configUrl = `${osApiRoot}/api/orgs/${orgId}/project_configurations/${setbackId}/`
+              await ossdk.project_form.setValues({ configuration_override: configUrl })
+            }
+            onClose()
+          }}
+          variant="contained"
+          color="primary"
+        >
+          Save
+        </Button>
+      </DialogActions>
+    </Dialog>
+  )
+}
+
 export function InputButtonMenu({ selectedTab, tabIndex, tabPrefix }: Props) {
   const [showDataModal, setShowDataModal] = useState(false)
   const [modalTitle, setModalTitle] = useState('')
   const [dataModalContent, setDataModalContent] = useState('')
+  const [openSetbacksDialog, setOpenSetbacksDialog] = useState(false)
+  const [setbackId, setSetbackId] = useState('')
+  const [setbackPrompt, setSetbackPrompt] = useState('')
   const [saving, setSaving] = useState(false)
 
   const { ossdk, osApiRoot, orgId, loaded, projectKey, hasUnsavedChanges, showAlertMessage, currentRole, progress } =
@@ -69,16 +129,13 @@ export function InputButtonMenu({ selectedTab, tabIndex, tabPrefix }: Props) {
           variant={'outlined'}
           disabled={commonDisablers}
           onClick={async () => {
-            let promptMessage = 'Override Setbacks\n\nThis should be pre-configured by your org at https://app.opensolar.com/#/project_configurations.\n\nPlease enter the Project Configuration ID:'
+            let promptMessage = 'This should be pre-configured in your OpenSolar organisation account in Control > Design & Hardware > Setbacks & Design Settings.\nPlease enter the ID which can be found at the end of the URL of the Setbacks & Design Settings (https://app.opensolar.com/#/project_configurations/)'
             if (process.env.REACT_APP_PROJECT_CONFIG_IDS) {
               const projectConfigIds = process.env.REACT_APP_PROJECT_CONFIG_IDS.split(",").join(", ")
-              promptMessage += ` Possible Values (${projectConfigIds})`
+              promptMessage += ` \nPossible Values (${projectConfigIds})`
             }
-            const configId = prompt(promptMessage)
-            if (configId) {
-              const configUrl = `${osApiRoot}/api/orgs/${orgId}/project_configurations/${configId}/`
-              await ossdk.project_form.setValues({ configuration_override: configUrl })
-            }
+            setSetbackPrompt(promptMessage)
+            setOpenSetbacksDialog(true)
           }}
         >
           Configure Setback
@@ -100,7 +157,7 @@ export function InputButtonMenu({ selectedTab, tabIndex, tabPrefix }: Props) {
           disabled={commonDisablers}
           onClick={async () => {
             await ossdk.project_form.setValues({ zip: String(90000 + Math.round(1000 * Math.random())) })
-            alert('Zip code set to random value. See Settings->Inspect->Project Form value\'s for details.')
+            showAlertMessage('Zip code set to random value. See Settings->Inspect->Project Form value\'s for details.', 'success')
             console.log('setValues complete')
           }}
         >
@@ -110,12 +167,12 @@ export function InputButtonMenu({ selectedTab, tabIndex, tabPrefix }: Props) {
         <Button
           variant="outlined"
           color="secondary"
-          disabled={commonDisablers || !hasUnsavedChanges}
+          disabled={commonDisablers || saving || !hasUnsavedChanges}
           onClick={() => doDiscard(ossdk)}
         >
           Discard
         </Button>
-        <Button variant="contained" disabled={commonDisablers || saving} onClick={async () => await doSave(ossdk, showAlertMessage, setSaving)}>
+        <Button variant="contained" disabled={commonDisablers || saving || !hasUnsavedChanges} onClick={async () => await doSave(ossdk, showAlertMessage, setSaving)}>
           Save
         </Button>
       </Stack>
@@ -126,6 +183,42 @@ export function InputButtonMenu({ selectedTab, tabIndex, tabPrefix }: Props) {
         setDataModalContent={setDataModalContent}
         dataTitle={modalTitle}
         setDataTitle={setModalTitle}
+      />
+      <Dialog open={openSetbacksDialog} onClose={() => setOpenSetbacksDialog(false)} >
+        <DialogTitle>Override Setbacks</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            {setbackPrompt}
+          </DialogContentText>
+          <TextField type="number" fullWidth required onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+            const { value } = e.target
+            setSetbackId(value)
+          }} />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenSetbacksDialog(false)} variant="outlined" color="secondary">
+            Cancel
+          </Button>
+          <Button onClick={async () => {
+            if (setbackId) {
+              const configUrl = `${osApiRoot}/api/orgs/${orgId}/project_configurations/${setbackId}/`
+              await ossdk.project_form.setValues({ configuration_override: configUrl })
+            }
+            setOpenSetbacksDialog(false)
+          }} variant="contained" color="primary">
+            Save
+          </Button>
+        </DialogActions>
+      </Dialog>
+      <SetbacksDialog
+        open={openSetbacksDialog}
+        onClose={() => setOpenSetbacksDialog(false)}
+        setSetbackId={setSetbackId}
+        setbackPrompt={setbackPrompt}
+        setbackId={setbackId}
+        osApiRoot={osApiRoot}
+        orgId={orgId}
+        ossdk={ossdk}
       />
     </CustomTabPanel>
   )

@@ -1,9 +1,11 @@
 import { AppBar, Box, Button, Container, createTheme, ThemeProvider, Toolbar, Typography } from '@mui/material'
+import { useState } from 'react'
 import { BrowserRouter, Link, Route, Routes } from 'react-router'
 import { ContainerProvider } from './ContainerContext'
 import DesignPage from './pages/DesignPage'
 import LandingPage from './pages/LandingPage'
 import ProjectsListPage from './pages/ProjectsListPage'
+import SettingsDrawer from './SettingsDrawer'
 
 const theme = createTheme({
   palette: {
@@ -59,40 +61,44 @@ const theme = createTheme({
 })
 
 function App() {
+  const [showSettingsDrawer, setShowSettingsDrawer] = useState(false)
+
   return (
     <ThemeProvider theme={theme}>
-      <BrowserRouter>
-        <div className="App">
-          <AppBar position="static">
-            <Container maxWidth="xl">
-              <Toolbar disableGutters>
-                <Link to="/">
-                  <img src="/logo.png" width="200px" alt="logo" />
-                </Link>
-                <Box>
-                  <Button key="Home" component={Link} to="/" variant="text">
-                    <Typography variant="h5" color="secondary">
-                      Home
-                    </Typography>
-                  </Button>
-                  <Button key="Projects" component={Link} to="/projects" variant="text">
-                    <Typography variant="h5" color="secondary">
-                      Projects
-                    </Typography>
-                  </Button>
-                </Box>
-              </Toolbar>
-            </Container>
-          </AppBar>
-          <ContainerProvider>
+      <ContainerProvider>
+        <BrowserRouter>
+          <div className="App">
+            <AppBar position="static">
+              <Container maxWidth="xl">
+                <Toolbar disableGutters>
+                  <Link to="/">
+                    <img src="/logo.png" width="200px" alt="logo" />
+                  </Link>
+                  <Box>
+                    <Button key="Home" component={Link} to="/" variant="text">
+                      <Typography variant="h5" color="secondary">
+                        Home
+                      </Typography>
+                    </Button>
+                    <Button key="Projects" component={Link} to="/projects" variant="text">
+                      <Typography variant="h5" color="secondary">
+                        Projects
+                      </Typography>
+                    </Button>
+                  </Box>
+                </Toolbar>
+              </Container>
+            </AppBar>
             <Routes>
               <Route index element={<LandingPage />} />
               <Route path="/projects" element={<ProjectsListPage />} />
               <Route path="/design/:id" element={<DesignPage />} />
             </Routes>
-          </ContainerProvider>
-        </div>
-      </BrowserRouter>
+
+            <SettingsDrawer showSettings={showSettingsDrawer} setShowSettings={setShowSettingsDrawer} />
+          </div>
+        </BrowserRouter>
+      </ContainerProvider>
     </ThemeProvider>
   )
 }
