@@ -3,12 +3,13 @@ import Alert from '@mui/material/Alert'
 import Paper from '@mui/material/Paper'
 import Snackbar from '@mui/material/Snackbar'
 import OsSdkView, { clearSignalHandlers } from '@opensolar/ossdk-react'
-import { useContext, useEffect, useState } from 'react'
+import { useContext, useLayoutEffect, useState } from 'react'
 import { useParams } from 'react-router'
 import { ContainerContext } from '../ContainerContext'
 import { InputButtonMenu, OutputButtonMenu } from '../elements/ButtonMenu'
 import FloatingToolbar from '../elements/FloatingToolbar'
 import ShowStateMessage from '../elements/ShowStateMessage'
+import { findSessionProject } from '../findSessionProject'
 
 enum ButtonTab {
   input = 0,
@@ -56,20 +57,16 @@ function DesignPage() {
   } = useContext(ContainerContext)
 
   const height = 600
+  const routeIdentifier = params.id
+  const projectMatchesRoute = Boolean(projectKey && routeIdentifier && projectKey === routeIdentifier)
 
-  useEffect(() => {
-    const sessionProjects = sessionStorage.getItem('projects')
-    if (osSdkKey && sessionProjects) {
-      const projects = JSON.parse(sessionProjects)
-      if (projects.length > 0) {
-        const project = projects.find((project) => project.identifier === params.id)
-        if (project) {
-          setProjectData(project)
-        }
-      }
+  // Hydrate before paint so OsSdkView never mounts against a stale localStorage identifier.
+  useLayoutEffect(() => {
+    const sessionProject = findSessionProject(routeIdentifier)
+    if (sessionProject && projectData?.identifier !== sessionProject.identifier) {
+      setProjectData(sessionProject)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [projectData?.identifier, routeIdentifier, setProjectData])
 
   const [selectedTab, setSelectedTab] = useState(ButtonTab.input)
 
@@ -118,8 +115,10 @@ function DesignPage() {
       {osOrgId && (
         <Paper elevation={3} style={{ backgroundColor: '#cccccc', padding: 20 }}>
           <div style={{ position: 'relative' }}>
-            {projectKey && showFloatingToolbar && <FloatingToolbar ossdk={ossdk} selected={selected} system={system} />}
-            {!projectKey && (
+            {projectMatchesRoute && showFloatingToolbar && (
+              <FloatingToolbar ossdk={ossdk} selected={selected} system={system} />
+            )}
+            {!projectMatchesRoute && (
               <div
                 id="dummy-viewport-before-creation"
                 style={{
@@ -129,7 +128,7 @@ function DesignPage() {
                 }}
               ></div>
             )}
-            {projectKey && (
+            {projectMatchesRoute && (
               <OsSdkView
                 height={height}
                 key={projectKey + projectIdentifiersToken + extraScriptParams}

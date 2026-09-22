@@ -5,3 +5,5 @@
 - Updated package versions
 - Added setbacks button
 - Improved formatting of data output
+
+0.0.4 - Require a country when creating a project, and fix a bug that showed multiple Studio windows
