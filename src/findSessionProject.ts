@@ -1,3 +1,5 @@
+import { projectWithNumericCoordinates } from './numericCoordinates'
+
 export function findSessionProject(
   identifier: string | undefined,
   storage: Pick<Storage, 'getItem'> = sessionStorage
@@ -17,7 +19,8 @@ export function findSessionProject(
       return null
     }
 
-    return projects.find((project) => project?.identifier === identifier) ?? null
+    const match = projects.find((project) => project?.identifier === identifier)
+    return match ? projectWithNumericCoordinates(match) : null
   } catch {
     return null
   }

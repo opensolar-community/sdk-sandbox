@@ -24,6 +24,7 @@ import WarningIcon from '@mui/icons-material/Warning';
 
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
+import { numericCoordinate, projectWithNumericCoordinates } from '../numericCoordinates';
 
 const EMPTY_PROJECT_FORM = {
   identifier: '',
@@ -321,7 +322,14 @@ const ProjectsList = () => {
   useEffect(() => {
     const storedRows = sessionStorage.getItem('projects')
     if (storedRows) {
-      setRows(JSON.parse(storedRows))
+      const parsed = JSON.parse(storedRows)
+      const projects = Array.isArray(parsed)
+        ? parsed.map((project) =>
+            project && typeof project === 'object' ? projectWithNumericCoordinates(project) : project
+          )
+        : parsed
+      setRows(projects)
+      sessionStorage.setItem('projects', JSON.stringify(projects))
     } else {
       sessionStorage.setItem('projects', JSON.stringify(_rows))
     }
@@ -337,15 +345,18 @@ const ProjectsList = () => {
     const { name, value } = e.target
     setFormData((prev) => ({ ...prev, [name]: value }))
   }
+  const savedLat = numericCoordinate(formData.lat)
+  const savedLon = numericCoordinate(formData.lon)
   const canSave = Boolean(
-    formData.identifier.trim() && formData.lat !== '' && formData.lon !== '' && formData.country_iso2
+    formData.identifier.trim() && savedLat !== undefined && savedLon !== undefined && formData.country_iso2
   )
   const handleSave = () => {
-    if (!canSave) {
+    if (!canSave || savedLat === undefined || savedLon === undefined) {
       return
     }
-    setRows((prevRows) => [...prevRows, { ...formData }])
-    sessionStorage.setItem('projects', JSON.stringify([...rows, { ...formData }]))
+    const project = { ...formData, lat: savedLat, lon: savedLon }
+    setRows((prevRows) => [...prevRows, project])
+    sessionStorage.setItem('projects', JSON.stringify([...rows, project]))
     handleClose()
   }
   const columns: GridColDef[] = [

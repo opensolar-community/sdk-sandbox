@@ -1,3 +1,5 @@
+import { numericCoordinate } from './numericCoordinates'
+
 export const doSave = async (ossdk, showAlertMessage, saveStatus = (saving) => {}) => {
   try {
     saveStatus(true)
@@ -82,8 +84,11 @@ export const runAutoDesign = async (
 }
 
 export const setLonLat = async (ossdk) => {
-  const projectLon = ossdk.project_form.values.value.lon
-  const projectLat = ossdk.project_form.values.value.lat
+  const projectLon = numericCoordinate(ossdk.project_form.values.value.lon)
+  const projectLat = numericCoordinate(ossdk.project_form.values.value.lat)
+  if (projectLon === undefined || projectLat === undefined) {
+    return
+  }
   var lonLat = [projectLon, projectLat]
 
   ossdk.studio.view.animateToLonLat([lonLat])
