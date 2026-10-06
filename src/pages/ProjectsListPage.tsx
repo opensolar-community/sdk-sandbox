@@ -24,6 +24,7 @@ import WarningIcon from '@mui/icons-material/Warning';
 
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
+import { nextProjectRows, projectWithNumericCoordinates } from '../numericCoordinates';
 
 const EMPTY_PROJECT_FORM = {
   identifier: '',
@@ -321,7 +322,14 @@ const ProjectsList = () => {
   useEffect(() => {
     const storedRows = sessionStorage.getItem('projects')
     if (storedRows) {
-      setRows(JSON.parse(storedRows))
+      const parsed = JSON.parse(storedRows)
+      const projects = Array.isArray(parsed)
+        ? parsed.map((project) =>
+            project && typeof project === 'object' ? projectWithNumericCoordinates(project) : project
+          )
+        : parsed
+      setRows(projects)
+      sessionStorage.setItem('projects', JSON.stringify(projects))
     } else {
       sessionStorage.setItem('projects', JSON.stringify(_rows))
     }
@@ -337,15 +345,19 @@ const ProjectsList = () => {
     const { name, value } = e.target
     setFormData((prev) => ({ ...prev, [name]: value }))
   }
-  const canSave = Boolean(
-    formData.identifier.trim() && formData.lat !== '' && formData.lon !== '' && formData.country_iso2
-  )
+  const canSave = nextProjectRows([], formData) !== null
   const handleSave = () => {
     if (!canSave) {
       return
     }
-    setRows((prevRows) => [...prevRows, { ...formData }])
-    sessionStorage.setItem('projects', JSON.stringify([...rows, { ...formData }]))
+    setRows((prevRows) => {
+      const nextRows = nextProjectRows(prevRows, formData)
+      if (!nextRows) {
+        return prevRows
+      }
+      sessionStorage.setItem('projects', JSON.stringify(nextRows))
+      return nextRows
+    })
     handleClose()
   }
   const columns: GridColDef[] = [

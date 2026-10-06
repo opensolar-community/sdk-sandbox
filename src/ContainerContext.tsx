@@ -1,6 +1,7 @@
 import { useOsSdk } from '@opensolar/ossdk-react'
 import { createContext, useEffect, useState } from 'react'
 import { clearLocalStorage, keysForLocalStorage, loadFromLocalStorage } from './localStorage'
+import { projectWithNumericCoordinates } from './numericCoordinates'
 import { getSetting, setSetting } from './settings'
 
 export const ContainerContext = createContext<Record<string, any>>({
@@ -153,7 +154,13 @@ const hashParams = new URLSearchParams(window.location.search)
 
 export function ContainerProvider({ children }) {
   const { loaded, ossdk } = useOsSdk()
-  const [projectData, setProjectData] = useState<any>(loadFromLocalStorage('projectData', null))
+  const [projectData, setProjectData] = useState<any>(() => {
+    const stored = loadFromLocalStorage('projectData', null)
+    if (stored && typeof stored === 'object') {
+      return projectWithNumericCoordinates(stored)
+    }
+    return stored
+  })
   const [projectFormValues, setProjectFormValues] = useState<any>()
 
   const projectKey = (projectData && projectData?.identifier) || null
@@ -224,7 +231,8 @@ export function ContainerProvider({ children }) {
   const saveToLocalStorage = () => {
     let values = {
       projectIdentifiersToken: projectIdentifiersToken,
-      projectData: projectData,
+      projectData:
+        projectData && typeof projectData === 'object' ? projectWithNumericCoordinates(projectData) : projectData,
       loginMethod: loginMethod,
     }
 

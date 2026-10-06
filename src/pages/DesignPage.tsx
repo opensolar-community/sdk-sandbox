@@ -63,10 +63,11 @@ function DesignPage() {
   // Hydrate before paint so OsSdkView never mounts against a stale localStorage identifier.
   useLayoutEffect(() => {
     const sessionProject = findSessionProject(routeIdentifier)
-    if (sessionProject && projectData?.identifier !== sessionProject.identifier) {
+    const coordinatesAreText = typeof projectData?.lat === 'string' || typeof projectData?.lon === 'string'
+    if (sessionProject && (projectData?.identifier !== sessionProject.identifier || coordinatesAreText)) {
       setProjectData(sessionProject)
     }
-  }, [projectData?.identifier, routeIdentifier, setProjectData])
+  }, [projectData?.identifier, projectData?.lat, projectData?.lon, routeIdentifier, setProjectData])
 
   const [selectedTab, setSelectedTab] = useState(ButtonTab.input)
 

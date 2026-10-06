@@ -18,6 +18,17 @@ test('returns the session project whose identifier matches the route', () => {
   expect(match).toEqual({ identifier: 'sydney-260903-c', lat: -33.8675 })
 })
 
+test('returns latitude and longitude as numbers when the session row stored them as text', () => {
+  const match = findSessionProject(
+    'india-text',
+    storageWith([{ identifier: 'india-text', lat: '28.6314512', lon: '77.2166672' }])
+  )
+
+  expect(match).toEqual({ identifier: 'india-text', lat: 28.6314512, lon: 77.2166672 })
+  expect(typeof match?.lat).toBe('number')
+  expect(typeof match?.lon).toBe('number')
+})
+
 test('returns null when the route identifier is missing from session storage', () => {
   expect(findSessionProject('missing', storageWith([{ identifier: 'other' }]))).toBeNull()
 })
