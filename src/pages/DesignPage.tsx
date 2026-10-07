@@ -3,13 +3,15 @@ import Alert from '@mui/material/Alert'
 import Paper from '@mui/material/Paper'
 import Snackbar from '@mui/material/Snackbar'
 import OsSdkView, { clearSignalHandlers } from '@opensolar/ossdk-react'
-import { useContext, useLayoutEffect, useState } from 'react'
+import { useContext, useEffect, useLayoutEffect, useState } from 'react'
 import { useParams } from 'react-router'
 import { ContainerContext } from '../ContainerContext'
 import { InputButtonMenu, OutputButtonMenu } from '../elements/ButtonMenu'
 import FloatingToolbar from '../elements/FloatingToolbar'
 import ShowStateMessage from '../elements/ShowStateMessage'
 import { findSessionProject } from '../findSessionProject'
+import { messageRevealsIframe, shouldCoverIframe } from '../jwtLoginCover'
+import { LoadingDots } from '../loadingDots'
 
 enum ButtonTab {
   input = 0,
@@ -70,6 +72,12 @@ function DesignPage() {
   }, [projectData?.identifier, projectData?.lat, projectData?.lon, routeIdentifier, setProjectData])
 
   const [selectedTab, setSelectedTab] = useState(ButtonTab.input)
+  const [jwtLoginSettled, setJwtLoginSettled] = useState(false)
+  const coverIframe = shouldCoverIframe(osToken, jwtLoginSettled)
+
+  useEffect(() => {
+    setJwtLoginSettled(false)
+  }, [osToken])
 
   const handleTabChange = (_, newValue: ButtonTab) => {
     setSelectedTab(newValue)
@@ -130,6 +138,8 @@ function DesignPage() {
               ></div>
             )}
             {projectMatchesRoute && (
+              <div style={{ position: 'relative', height }}>
+              <div style={{ visibility: coverIframe ? 'hidden' : 'visible' }}>
               <OsSdkView
                 height={height}
                 key={projectKey + projectIdentifiersToken + extraScriptParams}
@@ -140,6 +150,9 @@ function DesignPage() {
                 projectData={projectData}
                 extraScriptParams={extraScriptParams}
                 onMessage={(message, err) => {
+                  if (messageRevealsIframe(message?.text)) {
+                    setJwtLoginSettled(true)
+                  }
                   let messageText = message.text + (err && err?.message ? ': ' + err.message : '')
                   if (message.severity !== 'debug') {
                     showAlertMessage(messageText, message.severity)
@@ -249,6 +262,30 @@ function DesignPage() {
                   clearSignalHandlers(ossdk)
                 }}
               />
+              </div>
+              {coverIframe && (
+                <div
+                  role="status"
+                  aria-live="polite"
+                  aria-label="Loading"
+                  style={{
+                    position: 'absolute',
+                    top: 0,
+                    right: 0,
+                    bottom: 0,
+                    left: 0,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: 16,
+                    backgroundColor: '#ffffff',
+                  }}
+                >
+                  <LoadingDots />
+                </div>
+              )}
+              </div>
             )}
           </div>
         </Paper>

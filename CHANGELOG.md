@@ -9,3 +9,5 @@
 0.0.4 - Require a country when creating a project, and fix a bug that showed multiple Studio windows
 
 0.0.5 - Store latitude and longitude as numbers so Studio receives numeric coordinates, and save new projects from the list shown on screen
+
+0.0.6 - Show loading animation while waiting for studio to load
